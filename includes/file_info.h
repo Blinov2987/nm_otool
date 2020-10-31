@@ -6,7 +6,7 @@
 /*   By: gemerald <gemerald@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/30 21:50:12 by gemerald          #+#    #+#             */
-/*   Updated: 2020/10/30 22:00:21 by gemerald         ###   ########.fr       */
+/*   Updated: 2020/10/31 13:08:11 by gemerald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,10 @@
 
 typedef enum e_filename
 {
-	OBJECT,
-	OBJECT_64,
-	FAT_OBJECT,
-	ARCH
+	MAGIC_TYPE = 0,
+	MAGIC_64_TYPE = 1,
+	FAT_MAGIC_TYPE = 2,
+	FAT_MAGIT_64_TYPE = 3
 } t_file_type;
 
 typedef struct s_file
@@ -26,7 +26,7 @@ typedef struct s_file
 	char *file_name;
 	int fd;
 	size_t size;
-	t_file_type file_type;
+	uint32_t header;
 } t_file;
 
 #endif

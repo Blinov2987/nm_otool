@@ -6,7 +6,7 @@
 /*   By: gemerald <gemerald@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/30 18:40:54 by gemerald          #+#    #+#             */
-/*   Updated: 2020/10/31 10:22:50 by gemerald         ###   ########.fr       */
+/*   Updated: 2020/10/31 13:54:41 by gemerald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,47 +74,55 @@ void    free_file(t_file **file)
 	}
 }
 
-void    reverse_byte(unsigned char header[], size_t size)
-{
-	size_t i;
-	size_t len;
-	unsigned char swap;
-
-	i = -1;
-	len = size - 1;
-	while (++i < size / 2)
-	{
-		swap = header[i];
-		header[i] = header[len];
-		header[len] = swap;
-	}
-}
-
 int     recognize_header(t_file *file)
 {
 	uint32_t header;
 
 	read(file->fd, &header, sizeof(uint32_t));
-	if (header == MH_MAGIC_64)
+	if (header == MH_MAGIC_64 || header == MH_MAGIC
+		|| header == FAT_MAGIC || header == FAT_MAGIC_64)
+	{
+		file->header = header;
 		return (TRUE);
-	return FALSE;
+	}
+	return error_recognize_file(file->file_name);
 }
 
+void    init_walker(int (*walk_through[])(t_args *, t_file *))
+{
+//	walk_through[0] = &walk_magic;
+	walk_through[1] = &walk_magic_64;
+//	walk_through[2] = &walk_fat_magic;
+//	walk_through[3] = &walk_fat_magic_64;
+}
+
+int     select_file_type(t_file *file)
+{
+	if (file->header == MH_MAGIC)
+		return (MAGIC_TYPE);
+	if (file->header == MH_MAGIC_64)
+		return (MAGIC_64_TYPE);
+	if (file->header == FAT_MAGIC)
+		return (FAT_MAGIC_TYPE);
+	if (file->header == FAT_MAGIC_64)
+		return (FAT_MAGIT_64_TYPE);
+	return (5);
+}
 
 void    init_analytics(t_args *args)
 {
 	t_list *files;
 	t_file *file;
+	int     (*walk_through[4])(t_args *, t_file *);
 
 	files = args->filenames;
+	init_walker(walk_through);
 	while (files)
 	{
 		file = ft_memalloc(sizeof(t_file));
 		if (open_file(files->content, file) && recognize_header(file))
 		{
-			ft_printf("mach %d\n", sizeof(t_mach_header));
-			ft_printf("mach_64 %d\n", sizeof(t_mach_header_64));
-			ft_printf("fat %d\n", sizeof(t_fat_header));
+			walk_through[select_file_type(file)](args, file);
 		}
 		free_file(&file);
 		files = files->next;
