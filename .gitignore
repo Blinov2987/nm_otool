@@ -1,3 +1,13 @@
+#Clion
+cmake-build-debug
+objects
+a.out
+nm
+otool
+CMakeLists.txt
+.idea
+.DS_Store
+
 # Prerequisites
 *.d
 
