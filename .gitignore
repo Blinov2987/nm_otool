@@ -6,7 +6,6 @@ nm
 otool
 CMakeLists.txt
 .idea
-.DS_Store
 
 # Prerequisites
 *.d
