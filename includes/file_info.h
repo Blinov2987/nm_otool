@@ -6,12 +6,14 @@
 /*   By: gemerald <gemerald@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/30 21:50:12 by gemerald          #+#    #+#             */
-/*   Updated: 2020/10/31 13:08:11 by gemerald         ###   ########.fr       */
+/*   Updated: 2020/11/04 22:17:41 by gemerald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef NM_FILE_INFO_H
 #define NM_FILE_INFO_H
+
+typedef struct s_output t_output;
 
 typedef enum e_filename
 {
@@ -23,10 +25,25 @@ typedef enum e_filename
 
 typedef struct s_file
 {
-	char *file_name;
+	char *name;
 	int fd;
 	size_t size;
 	uint32_t header;
+	void *start;
+	t_list *segment_list;
+	t_list *section_list;
+	size_t nsections;
+	t_output *output;
+	size_t out_size;
 } t_file;
+
+struct s_output
+{
+	uint64_t value;
+	unsigned char type;
+	char *name;
+};
+
+void    free_file(t_file **file);
 
 #endif

@@ -1,61 +1,16 @@
-//
-// Created by Grass Emerald on 10/28/20.
-//
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   args_finder.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gemerald <gemerald@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/11/04 23:10:03 by gemerald          #+#    #+#             */
+/*   Updated: 2020/11/04 23:10:32 by gemerald         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#include "args.h"
-#include "libft.h"
-#include "constants.h"
-
-int     contains_char_sym(char *str, char to_count)
-{
-	int i;
-
-	i = -1;
-	while (str[++i])
-	{
-		if (str[i] == to_count)
-			return TRUE;
-	}
-	return FALSE;
-}
-
-int     is_correct_flag(char f)
-{
-	if (contains_char_sym(ARGS_SYMBOLS, f))
-		return TRUE;
-	return FALSE;
-}
-
-void    set_flag(char f, t_args *args)
-{
-	if (f == 'o')
-		args->flag_o++;
-	if (f == 'n')
-		args->flag_n++;
-	if (f == 'u')
-		args->flag_u++;
-	if (f == 'U')
-		args->flag_big_u++;
-	if (f == 'j')
-		args->flag_j++;
-}
-
-void    find_args(char *str, t_args *args)
-{
-	int i;
-
-	i = -1;
-	while (str[++i])
-	{
-		if (is_correct_flag(str[i]))
-			set_flag(str[i], args);
-		else
-		{
-			ft_lstadd(&args->bad_argums, ft_lstnew(str, ft_strlen(str) + 1));
-			break;
-		}
-	}
-}
+#include "nm.h"
 
 int     is_argums(char *av)
 {
@@ -69,13 +24,9 @@ int     is_argums(char *av)
 void    pars_args(char *av, t_args *args)
 {
 	if(is_argums(av))
-	{
 		find_args(&av[1], args);
-	}
 	else
-	{
 		ft_lstadd(&args->filenames, ft_lstnew(av, ft_strlen(av) + 1));
-	}
 }
 
 t_args    *take_args(int ac, char **av)
@@ -90,5 +41,26 @@ t_args    *take_args(int ac, char **av)
 	{
 		pars_args(av[i], args);
 	}
+	if (args->filenames && args->filenames->next)
+		args->is_multi_file = TRUE;
 	return args;
+}
+
+int    validate_args(t_args **args, int ac)
+{
+	if (ac < 2)
+		return (print_usage());
+	if ((*args)->flag_o > 1 || (*args)->flag_big_u > 1 || (*args)->flag_j > 1 ||
+	    (*args)->flag_u > 1 || (*args)->flag_n > 1 || (*args)->bad_argums)
+	{
+		if ((*args)->flag_o > 1 || (*args)->flag_big_u > 1 || (*args)->flag_j > 1 ||
+		    (*args)->flag_u > 1 || (*args)->flag_n > 1)
+			error_print_multiple_flags(*args);
+		if ((*args)->bad_argums)
+			error_print_bad_argums(*args);
+		return FALSE;
+	}
+	if (!(*args)->filenames)
+		return (print_usage());
+	return TRUE;
 }
