@@ -15,13 +15,13 @@
 int    print_usage(void)
 {
 	ft_printf("usage:\n");
-	ft_printf("\t\t ft_nm -[o | n | u | U | j] <name>\n");
+	ft_printf("\t\t nm-otool -[o | n | u | U | j] <name>\n");
 	return FALSE;
 }
 
 void    error_print_multiple_flags(t_args *args)
 {
-	ft_putstr_fd("ft_nm: for the ",2);
+	ft_putstr_fd("nm-otool: for the ",2);
 	if (args->flag_o > 1)
 		ft_putstr_fd("-print-file-name",2);
 	if (args->flag_big_u > 1)
@@ -42,7 +42,7 @@ void    error_print_bad_argums(t_args *args)
 	iter = args->bad_argums;
 	while (iter)
 	{
-		ft_putstr_fd("ft_nm: Unknown command line argument '-", 2);
+		ft_putstr_fd("nm-otool: Unknown command line argument '-", 2);
 		ft_putstr_fd(iter->content, 2);
 		ft_putstr_fd("'\n", 2);
 		iter = iter->next;

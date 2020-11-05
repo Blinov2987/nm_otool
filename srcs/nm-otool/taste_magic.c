@@ -6,7 +6,7 @@
 /*   By: gemerald <gemerald@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/30 18:40:54 by gemerald          #+#    #+#             */
-/*   Updated: 2020/11/05 13:12:32 by gemerald         ###   ########.fr       */
+/*   Updated: 2020/11/05 13:57:41 by gemerald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,16 +73,21 @@ void    init_analytics(t_args *args)
 	t_list *files;
 	t_file *file;
 	int     (*walk_through[4])(t_file *);
+	int     success;
 
 	files = args->filenames;
+	success = FALSE;
 	init_walker(walk_through);
 	while (files)
 	{
 		file = ft_memalloc(sizeof(t_file));
 		if (open_file(files->content, file) && recognize_header(file))
 		{
-			if (walk_through[select_file_type(file)](file))
+			if ((success = walk_through[select_file_type(file)](file)) &&
+					!args->is_outool)
 				print_output(file, args);
+			else if (success && args->is_outool)
+				print_otool(file);
 			else
 				error_file_corrupt(file->name);
 		}
