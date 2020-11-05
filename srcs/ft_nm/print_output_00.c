@@ -6,70 +6,16 @@
 /*   By: gemerald <gemerald@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/04 21:23:13 by gemerald          #+#    #+#             */
-/*   Updated: 2020/11/04 22:02:05 by gemerald         ###   ########.fr       */
+/*   Updated: 2020/11/05 11:53:17 by gemerald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "nm.h"
 
-void    number_sort(t_file *file)
-{
-	size_t i;
-	size_t j;
-	t_output swap;
-
-	i = 0;
-	while (i < file->out_size - 1)
-	{
-		j = i;
-		while (++j < file->out_size)
-		{
-			if (file->output[i].value > file->output[j].value)
-			{
-				swap = file->output[j];
-				file->output[j] = file->output[i];
-				file->output[i] = swap;
-			}
-		}
-		i++;
-	}
-}
-
-void    literal_sort(t_file *file)
-{
-	size_t i;
-	size_t j;
-	t_output swap;
-
-	i = 0;
-	while (i < file->out_size - 1)
-	{
-		j = i;
-		while (++j < file->out_size)
-		{
-			if (ft_strcmp(file->output[i].name, file->output[j].name) > 0)
-			{
-				swap = file->output[j];
-				file->output[j] = file->output[i];
-				file->output[i] = swap;
-			}
-		}
-		i++;
-	}
-}
-
 void    multi_file(t_file *file, t_args *args)
 {
 	if (args->is_multi_file && !args->flag_o)
 		ft_printf("%s:\n", file->name);
-}
-
-void    make_sort(t_file *file, t_args *args)
-{
-	if (args->flag_n)
-		number_sort(file);
-	else
-		literal_sort(file);
 }
 
 void    print_file_name(t_file *file, t_args *args)

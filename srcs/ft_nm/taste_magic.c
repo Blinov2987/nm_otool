@@ -6,7 +6,7 @@
 /*   By: gemerald <gemerald@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/30 18:40:54 by gemerald          #+#    #+#             */
-/*   Updated: 2020/11/04 23:00:07 by gemerald         ###   ########.fr       */
+/*   Updated: 2020/11/05 13:12:32 by gemerald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,13 +34,14 @@ int     open_file(char *file_name, t_file *file)
 
 int     recognize_header(t_file *file)
 {
-	uint32_t header;
+	uint32_t *header;
 
-	read(file->fd, &header, sizeof(uint32_t));
-	if (header == MH_MAGIC_64 || header == MH_MAGIC
-		|| header == FAT_MAGIC || header == FAT_MAGIC_64)
+	file->start = mmap(NULL, file->size, PROT_READ, MAP_PRIVATE, file->fd, 0);
+	header = (uint32_t *)file->start;
+	if (*header == MH_MAGIC_64 || *header == MH_MAGIC
+		|| *header == FAT_MAGIC || *header == FAT_MAGIC_64)
 	{
-		file->header = header;
+		file->header = *header;
 		return (TRUE);
 	}
 	return error_recognize_file(file->name);
@@ -48,10 +49,10 @@ int     recognize_header(t_file *file)
 
 void    init_walker(int (*walk_through[])(t_file *))
 {
-//	walk_through[0] = &walk_magic;
+	walk_through[0] = &walk_magic;
 	walk_through[1] = &walk_magic_64;
-//	walk_through[2] = &walk_fat_magic;
-//	walk_through[3] = &walk_fat_magic_64;
+	walk_through[2] = &walk_fat_magic;
+	walk_through[3] = &walk_fat_magic_64;
 }
 
 int     select_file_type(t_file *file)

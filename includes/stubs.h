@@ -1,24 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   stubs.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gemerald <gemerald@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/04 22:42:07 by gemerald          #+#    #+#             */
-/*   Updated: 2020/11/04 22:42:07 by gemerald         ###   ########.fr       */
+/*   Created: 2020/11/05 13:16:07 by gemerald          #+#    #+#             */
+/*   Updated: 2020/11/05 13:16:07 by gemerald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "nm.h"
+#ifndef NM_STUBS_H
+#define NM_STUBS_H
 
-int     main(int ac, char **av)
-{
-	t_args *args;
+# include "nm.h"
 
-	args = take_args(ac, av);
-	if (validate_args(&args, ac))
-		init_analytics(args);
-	free_args(&args);
-	return 0;
-}
+int walk_magic(t_file *file);
+int walk_fat_magic(t_file *file);
+int walk_fat_magic_64(t_file *file);
+
+#endif

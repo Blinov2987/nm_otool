@@ -6,13 +6,13 @@
 /*   By: gemerald <gemerald@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/31 13:04:42 by gemerald          #+#    #+#             */
-/*   Updated: 2020/11/04 21:24:54 by gemerald         ###   ########.fr       */
+/*   Updated: 2020/11/05 13:12:32 by gemerald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "nm.h"
 
-char    *find_mysection(t_file *file, uint8_t index)
+char    *find_section(t_file *file, uint8_t index)
 {
 	uint8_t i;
 	uint8_t len;
@@ -35,23 +35,26 @@ unsigned char find_in_symbol_section(t_file *file, t_nlist *command)
 {
 	char *name;
 
-	if (name = find_mysection(file, command->n_sect))
+	name = find_section(file, command->n_sect);
+	if (name)
 	{
-		if (!ft_strcmp(name, SECT_TEXT))
-			return ('T');
-		else if (!ft_strcmp(name, SECT_DATA))
+		if (!ft_strcmp(name, SECT_DATA))
 			return ('D');
+		else if (!ft_strcmp(name, SECT_TEXT))
+			return ('T');
 		else if (!ft_strcmp(name, SECT_BSS))
 			return ('B');
 		else
 			return ('S');
 	}
-	return ('?');
+	return ('!');
 }
 
 void    set_entry_type(t_nlist *command, t_file *file, t_output *output)
 {
-	if (N_STAB & command->n_type)
+	if ((N_TYPE & command->n_type) == N_SECT)
+		output->type =  find_in_symbol_section(file, command);
+	else if (N_STAB & command->n_type)
 		output->type =  '-';
 	else if ((N_TYPE & command->n_type) == N_UNDF)
 	{
@@ -60,15 +63,13 @@ void    set_entry_type(t_nlist *command, t_file *file, t_output *output)
 		else
 			output->type = '?';
 	}
-	else if ((N_TYPE & command->n_type) == N_SECT)
-		output->type =  find_in_symbol_section(file, command);
-	else if ((N_TYPE & command->n_type) == N_ABS)
-		output->type = 'A';
 	else if ((N_TYPE & command->n_type) == N_INDR)
 		output->type = 'I';
+	else if ((N_TYPE & command->n_type) == N_ABS)
+		output->type = 'A';
 }
 
-void  *parse_symtab(void *start, size_t off_set, t_file *file)
+int parse_symtab(void *start, size_t off_set, t_file *file)
 {
 	uint64_t symb_offset;
 	t_nlist *symb;
@@ -87,13 +88,14 @@ void  *parse_symtab(void *start, size_t off_set, t_file *file)
 		file->output[j].value = symb->n_value;
 		symb_offset += sizeof(t_nlist);
 		if (symb_offset >= file->size)
-			return (NULL);
+			return (FALSE);
 		set_entry_type(symb, file, &file->output[j]);
 		j++;
 	}
+	return (TRUE);
 }
 
-void *see_in_segment_moment(void *start, size_t off_set, t_file *file)
+int see_in_segment_moment(void *start, size_t off_set, t_file *file)
 {
 	t_segment_command_64 *segment;
 	t_section_64 *section_64;
@@ -111,23 +113,26 @@ void *see_in_segment_moment(void *start, size_t off_set, t_file *file)
 		section_64 = (t_section_64 *) (start + off_set);
 		file->nsections++;
 		ft_lstadd(&file->section_list, ft_lstnew((section_64), sizeof(t_section_64 *)));
-		int y = 0;
-//		if (!ft_strcmp(section_64->sectname, "__text"))
-//		{
-//			void *start_code = (void *) (start + section_64->offset);
-//			int j = -1;
-//			while (++j < section_64->size)
-//			{
-//				if (j != 0 && !((j) % 16))
-//					ft_printf("\n");
-//				ft_printf("%02x ", ((unsigned char *) start_code)[j]);
-//			}
-//		}
 		off_set += sizeof(t_section_64);
 		if (off_set >= file->size)
-			return (NULL);
-		int x = 0;
+			return (FALSE);
 	}
+	return (TRUE);
+}
+
+int    save_commands(size_t off_set, t_file *file, t_load_command *command)
+{
+	if (command->cmd == LC_SEGMENT_64)
+	{
+		if (!(see_in_segment_moment(file->start, off_set, file)))
+			return (FALSE);
+		ft_lstadd(&file->segment_list,
+				ft_lstnew(((t_segment_command_64 *)(file->start + off_set)),
+						sizeof(t_segment_command_64)));
+	}
+	if (command->cmd == LC_SYMTAB && !parse_symtab(file->start, off_set, file))
+		return (FALSE);
+	return (TRUE);
 }
 
 int walk_magic_64(t_file *file)
@@ -137,26 +142,16 @@ int walk_magic_64(t_file *file)
 	t_load_command *load_command;
 	int i = -1;
 
-	file->start = mmap(NULL, file->size, PROT_READ, MAP_PRIVATE, file->fd, 0);
 	off_set = sizeof(t_mach_header_64);
-	header_64 = mmap(NULL, sizeof(t_mach_header_64), PROT_READ, MAP_PRIVATE, file->fd, 0);
-	int command_count = header_64->ncmds;
-	while (++i < command_count)
+	header_64 = mmap(NULL, sizeof(t_mach_header_64),
+			PROT_READ, MAP_PRIVATE, file->fd, 0);
+	while (++i < header_64->ncmds)
 	{
 		load_command = (t_load_command *)(file->start + off_set);
-		if (load_command->cmd == LC_SEGMENT_64)
-		{
-			see_in_segment_moment(file->start, off_set, file);
-			ft_lstadd(&file->segment_list,
-					ft_lstnew(((t_segment_command_64 *) (file->start + off_set)), sizeof(t_segment_command_64)));
-		}
-		if (load_command->cmd == LC_SYMTAB)
-		{
-			parse_symtab(file->start, off_set, file);
-		}
+		save_commands(off_set, file, load_command);
+		off_set += load_command->cmdsize;
 		if (off_set >= file->size)
 			return (FALSE);
-		off_set += load_command->cmdsize;
 	}
 	return (TRUE);
 }

@@ -6,7 +6,7 @@
 /*   By: gemerald <gemerald@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/31 15:17:46 by gemerald          #+#    #+#             */
-/*   Updated: 2020/11/04 23:00:07 by gemerald         ###   ########.fr       */
+/*   Updated: 2020/11/05 12:11:49 by gemerald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,15 @@
 #include "headers.h"
 #include "file_info.h"
 #include "constants.h"
+#include "stubs.h"
 #include <sys/mman.h>
 
 
 
 void    init_analytics(t_args *args);
 int     walk_magic_64(t_file *file);
+void    make_sort(t_file *file, t_args *args);
 void    print_output(t_file *file, t_args *args);
+void    print_otool(t_file *file);
 
 #endif

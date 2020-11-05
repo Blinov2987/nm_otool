@@ -1,6 +1,14 @@
-//
-// Created by Grass Emerald on 10/28/20.
-//
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   args.h                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gemerald <gemerald@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/11/05 10:48:19 by gemerald          #+#    #+#             */
+/*   Updated: 2020/11/05 10:48:19 by gemerald         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #ifndef ARGS_H
 # define ARGS_H
@@ -10,11 +18,12 @@
 
 typedef struct s_args
 {
-	char flag_o;
-	char flag_n;
-	char flag_u;
-	char flag_big_u;
-	char flag_j;
+	int     is_outool;
+	char    flag_o;
+	char    flag_n;
+	char    flag_u;
+	char    flag_big_u;
+	char    flag_j;
 	t_list        *bad_argums;
 	t_list        *filenames;
 	int is_multi_file;
